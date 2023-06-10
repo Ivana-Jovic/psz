@@ -1,5 +1,7 @@
 import { Dataset, createCheerioRouter } from "crawlee";
 import { Cheerio, AnyNode, CheerioAPI } from "cheerio";
+import { db } from "./db/drizzle.ts";
+import { aparmentsForRent } from "./db/schema/aparmentsForRent.ts";
 
 export const router = createCheerioRouter();
 
@@ -154,6 +156,7 @@ router.addHandler("property", async ({ request, $, log }) => {
       ? false
       : undefined;
 
+  //todo ne moze undef kao i ostali bool
   const heating = detailsOtherList && getDetail("grejanje", detailsOtherList); // jel ovo vraca str
   const heatingCentral = heating?.includes("centralno grejanje");
   const heatingTA = heating?.includes("ta peć");
@@ -165,8 +168,8 @@ router.addHandler("property", async ({ request, $, log }) => {
     "etažno grejanje na čvrsto gorivo"
   );
   const heatingOther =
-    heating &&
-    heating.length > 0 &&
+    // heating &&
+    (heating?.length ?? 0) > 0 &&
     !heatingCentral &&
     !heatingCentral &&
     !heatingTA &&
@@ -195,7 +198,7 @@ router.addHandler("property", async ({ request, $, log }) => {
     (elem) => elem.includes("garaža") || elem.includes("garažno mesto")
   );
 
-  log.info(`Currently on "${title}"`, {
+  const propertyObj = {
     title,
     price,
     size,
@@ -210,7 +213,7 @@ router.addHandler("property", async ({ request, $, log }) => {
     numOfBathrooms,
     numOfRooms,
     registered,
-    heating,
+    // heating,
     heatingCentral,
     heatingTA,
     heatingAirConditioning,
@@ -224,7 +227,58 @@ router.addHandler("property", async ({ request, $, log }) => {
     parking,
     garage,
     url: request.loadedUrl,
-  });
+  };
+  log.info(`Currently on "${title}"`, propertyObj);
+  // log.info(`Currently on "${title}"`, aparmentsForRent.);
+  if (isForRent === undefined || isApartment === undefined) {
+    //todo log
+    return;
+  }
+  await db
+    .insert(aparmentsForRent)
+    .values({
+      //todo prebaci gore
+      ...propertyObj,
+      price: propertyObj.price?.toString(),
+      size: propertyObj.size?.toString(),
+      numOfRooms: propertyObj.numOfRooms?.toString(),
+      numOfBathrooms: propertyObj.numOfBathrooms?.toString(),
+    })
+    .onConflictDoUpdate({
+      target: [aparmentsForRent.url],
+      set: {
+        ...propertyObj,
+        price: propertyObj.price?.toString(),
+        size: propertyObj.size?.toString(),
+        numOfRooms: propertyObj.numOfRooms?.toString(),
+        numOfBathrooms: propertyObj.numOfBathrooms?.toString(),
+      },
+    });
+  if (isForRent && isApartment) {
+    // await db
+    //   .insert(aparmentsForRent)
+    //   .values({
+    //     //todo prebaci gore
+    //     ...propertyObj,
+    //     price: propertyObj.price?.toString(),
+    //     size: propertyObj.size?.toString(),
+    //     numOfRooms: propertyObj.numOfRooms?.toString(),
+    //     numOfBathrooms: propertyObj.numOfBathrooms?.toString(),
+    //   })
+    //   .onConflictDoUpdate({
+    //     target: [aparmentsForRent.url],
+    //     set: {
+    //       ...propertyObj,
+    //       price: propertyObj.price?.toString(),
+    //       size: propertyObj.size?.toString(),
+    //       numOfRooms: propertyObj.numOfRooms?.toString(),
+    //       numOfBathrooms: propertyObj.numOfBathrooms?.toString(),
+    //     },
+    //   });
+  } else if (isForRent && isApartment) {
+  } else if (isForRent && isApartment) {
+  } else {
+  }
 
   const dataset = await Dataset.open("crawled_properties");
 

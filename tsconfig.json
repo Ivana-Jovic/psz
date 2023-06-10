@@ -5,7 +5,11 @@
         "target": "ES2022",
         "outDir": "dist",
         "noUnusedLocals": false,
-        "lib": ["DOM"]
+        "lib": ["DOM"],
+        "esModuleInterop": true,
+        "moduleResolution": "node",
+        "emitDeclarationOnly": true,
+        "allowImportingTsExtensions": true,
     },
     "include": [
         "./src/**/*"

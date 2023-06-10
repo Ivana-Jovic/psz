@@ -1,5 +1,8 @@
 import { CheerioCrawler, ProxyConfiguration } from "crawlee";
-import { router } from "./routes.js";
+import { router } from "./routes.ts";
+import { drizzle } from "drizzle-orm/postgres-js";
+import { migrate } from "drizzle-orm/postgres-js/migrator";
+import { migrationClient } from "./db/drizzle.ts";
 
 const startUrls = [
   //   {
@@ -8,7 +11,7 @@ const startUrls = [
   //   },
 
   {
-    url: "https://www.nekretnine.rs/stambeni-objekti/kuce/fantasticna-kuca-u-starom-beceju-170m2/Nk7LfKkr7tt/",
+    url: "https://www.nekretnine.rs/stambeni-objekti/stanovi/stan-za-izdavanje/NkdV1RQAs47/",
     label: "property",
   },
 ];
@@ -18,5 +21,8 @@ const crawler = new CheerioCrawler({
   maxRequestsPerCrawl: 10,
   maxRequestsPerMinute: 20,
 });
+
+// this will automatically run needed migrations on the database
+await migrate(drizzle(migrationClient), { migrationsFolder: "./drizzle" });
 
 await crawler.run(startUrls);
