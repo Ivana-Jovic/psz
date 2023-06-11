@@ -4,6 +4,7 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { migrationClient } from "./db/drizzle.ts";
 
+//TODO nije provereno radi li prelazak na novu stranu
 const startUrls = [
   //   {
   //     url: "https://www.nekretnine.rs/stambeni-objekti/stanovi/izdavanje-prodaja/prodaja/cena/1_100000/lista/po-stranici/20/",
@@ -11,7 +12,8 @@ const startUrls = [
   //   },
 
   {
-    url: "https://www.nekretnine.rs/stambeni-objekti/stanovi/stan-za-izdavanje/NkdV1RQAs47/",
+    // https://www.nekretnine.rs/stambeni-objekti/stanovi/undefined/Nk_49ImEdhu/
+    url: "https://www.nekretnine.rs/stambeni-objekti/stanovi/petosoban-stan-sa-garaznim-mestom-vracarski-plato/NkpyXfjXRJ_/",
     label: "property",
   },
 ];
@@ -23,6 +25,6 @@ const crawler = new CheerioCrawler({
 });
 
 // this will automatically run needed migrations on the database
-await migrate(drizzle(migrationClient), { migrationsFolder: "./drizzle" });
+await migrate(drizzle(migrationClient), { migrationsFolder: "./drizzle" }); //razl
 
 await crawler.run(startUrls);

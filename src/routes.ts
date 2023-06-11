@@ -1,7 +1,16 @@
 import { Dataset, createCheerioRouter } from "crawlee";
 import { Cheerio, AnyNode, CheerioAPI } from "cheerio";
 import { db } from "./db/drizzle.ts";
-import { aparmentsForRent } from "./db/schema/aparmentsForRent.ts";
+import {
+  aparmentsForRent,
+  NewAparmentsForRent,
+} from "./db/schema/aparmentsForRent.ts";
+import {
+  aparmentsForSale,
+  NewAparmentsForSale,
+} from "./db/schema/aparmentsForSale.ts";
+import { housesForRent, NewHousesForRent } from "./db/schema/housesForRent.ts";
+import { housesForSale, NewHousesForSale } from "./db/schema/housesForSale.ts";
 
 export const router = createCheerioRouter();
 
@@ -64,26 +73,6 @@ const stringToNumber = (str: string) => {
 };
 
 router.addHandler("property", async ({ request, $, log }) => {
-  /*
-    tip nekretnine
-    tip ponude
-    title
-    lokacija grad i deo grada
-    kvadratura
-    cena ukupna
-    godina izgradnje
-    povrsina zemljista (samo za kuce)
-    spratnost (ukupna i sprat na kojoj se nalazi, samo za stanove)
-    uknjiženost (da/ne)
-    tip grejanja
-    ukupan broj soba
-    ukupan broj kupatila (toaleta)
-    podaci o parkingu (da/ne)//
-    dodatne informacije (da li ima lift u zgradi, da li ima terasu/lođu/balkon)//
-        da li ima lift u zgradi
-        da li ima terasu/lođu/balkon
-    */
-
   const detailsChildren = $("#detalji").children(".property__amenities");
   const detailsMain = detailsChildren.first();
   const detailsAdditional =
@@ -156,15 +145,14 @@ router.addHandler("property", async ({ request, $, log }) => {
       ? false
       : undefined;
 
-  //todo ne moze undef kao i ostali bool
   const heating = detailsOtherList && getDetail("grejanje", detailsOtherList); // jel ovo vraca str
-  const heatingCentral = heating?.includes("centralno grejanje");
-  const heatingTA = heating?.includes("ta peć");
-  const heatingAirConditioning = heating?.includes("klima uređa");
-  const heatingFloor = heating?.includes("centralno grejanje");
-  const heatingElectricity = heating?.includes("etažno grejanje na struju");
-  const heatingGas = heating?.includes("etažno grejanje na gas");
-  const heatingSolidFuel = heating?.includes(
+  const heatingCentral = !!heating?.includes("centralno grejanje");
+  const heatingTA = !!heating?.includes("ta peć");
+  const heatingAirConditioning = !!heating?.includes("klima uređa");
+  const heatingFloor = !!heating?.includes("centralno grejanje");
+  const heatingElectricity = !!heating?.includes("etažno grejanje na struju");
+  const heatingGas = !!heating?.includes("etažno grejanje na gas");
+  const heatingSolidFuel = !!heating?.includes(
     "etažno grejanje na čvrsto gorivo"
   );
   const heatingOther =
@@ -197,22 +185,27 @@ router.addHandler("property", async ({ request, $, log }) => {
   const garage = !!detailsAdditionallist?.find(
     (elem) => elem.includes("garaža") || elem.includes("garažno mesto")
   );
-
-  const propertyObj = {
+  //TODO check if ok zato sto se koristi i for sale tip
+  const propertyObjApartment: NewAparmentsForRent = {
+    url: request.url, //request.loadedUrl,
     title,
-    price,
-    size,
-    isForRent,
-    isApartment,
+    price: price?.toString(),
+    size: size?.toString(),
+    // isForRent,
+    // isApartment,
     location,
     city,
     yearOfConstruction,
-    landSurface,
+    // landSurface,
     floor,
     totalFloors,
-    numOfBathrooms,
-    numOfRooms,
+    numOfBathrooms: numOfBathrooms?.toString(),
+    numOfRooms: numOfRooms?.toString(),
     registered,
+    elevator,
+    terrace,
+    parking,
+    garage,
     // heating,
     heatingCentral,
     heatingTA,
@@ -222,62 +215,63 @@ router.addHandler("property", async ({ request, $, log }) => {
     heatingGas,
     heatingSolidFuel,
     heatingOther,
+  };
+  //TODO izmeni redosled kolona u bazi
+  //TODO check if ok zato sto se koristi i for sale tip
+  const propertyObjHouse: NewHousesForRent = {
+    url: request.url, //request.loadedUrl,
+    title,
+    price: price?.toString(),
+    size: size?.toString(),
+    // isForRent,
+    // isApartment,
+    location,
+    city,
+    yearOfConstruction,
+    landSurface: landSurface?.toString(),
+    // floor,
+    totalFloors,
+    numOfBathrooms: numOfBathrooms?.toString(),
+    numOfRooms: numOfRooms?.toString(),
+    registered,
     elevator,
     terrace,
     parking,
     garage,
-    url: request.loadedUrl,
+    // heating,
+    heatingCentral,
+    heatingTA,
+    heatingAirConditioning,
+    heatingFloor,
+    heatingElectricity,
+    heatingGas,
+    heatingSolidFuel,
+    heatingOther,
   };
-  log.info(`Currently on "${title}"`, propertyObj);
+  log.info(`Currently on "${title}"`, propertyObjApartment);
   // log.info(`Currently on "${title}"`, aparmentsForRent.);
   if (isForRent === undefined || isApartment === undefined) {
     //todo log
     return;
   }
-  await db
-    .insert(aparmentsForRent)
-    .values({
-      //todo prebaci gore
-      ...propertyObj,
-      price: propertyObj.price?.toString(),
-      size: propertyObj.size?.toString(),
-      numOfRooms: propertyObj.numOfRooms?.toString(),
-      numOfBathrooms: propertyObj.numOfBathrooms?.toString(),
-    })
-    .onConflictDoUpdate({
-      target: [aparmentsForRent.url],
-      set: {
-        ...propertyObj,
-        price: propertyObj.price?.toString(),
-        size: propertyObj.size?.toString(),
-        numOfRooms: propertyObj.numOfRooms?.toString(),
-        numOfBathrooms: propertyObj.numOfBathrooms?.toString(),
-      },
-    });
-  if (isForRent && isApartment) {
-    // await db
-    //   .insert(aparmentsForRent)
-    //   .values({
-    //     //todo prebaci gore
-    //     ...propertyObj,
-    //     price: propertyObj.price?.toString(),
-    //     size: propertyObj.size?.toString(),
-    //     numOfRooms: propertyObj.numOfRooms?.toString(),
-    //     numOfBathrooms: propertyObj.numOfBathrooms?.toString(),
-    //   })
-    //   .onConflictDoUpdate({
-    //     target: [aparmentsForRent.url],
-    //     set: {
-    //       ...propertyObj,
-    //       price: propertyObj.price?.toString(),
-    //       size: propertyObj.size?.toString(),
-    //       numOfRooms: propertyObj.numOfRooms?.toString(),
-    //       numOfBathrooms: propertyObj.numOfBathrooms?.toString(),
-    //     },
-    //   });
-  } else if (isForRent && isApartment) {
-  } else if (isForRent && isApartment) {
+
+  if (isApartment) {
+    await db
+      .insert(isForRent ? aparmentsForRent : aparmentsForSale)
+      .values(propertyObjApartment)
+      .onConflictDoUpdate({
+        target: [(isForRent ? aparmentsForRent : aparmentsForSale).url],
+        set: { ...propertyObjApartment },
+      });
   } else {
+    // house
+    await db
+      .insert(isForRent ? housesForRent : housesForSale)
+      .values(propertyObjHouse)
+      .onConflictDoUpdate({
+        target: [(isForRent ? housesForRent : housesForSale).url],
+        set: { ...propertyObjHouse },
+      });
   }
 
   const dataset = await Dataset.open("crawled_properties");

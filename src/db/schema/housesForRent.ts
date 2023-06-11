@@ -27,6 +27,10 @@ export const housesForRent = pgTable(
     numOfBathrooms: decimal("num_of_bathrooms"),
     numOfRooms: decimal("num_of_rooms"),
     registered: boolean("registered"),
+    elevator: boolean("elevator"),
+    terrace: boolean("terrace"),
+    parking: boolean("parking"),
+    garage: boolean("garage"),
     heatingCentral: boolean("heating_central"),
     heatingTA: boolean("heating_ta"),
     heatingAirConditioning: boolean("heating_air_conditioning"),
@@ -35,10 +39,6 @@ export const housesForRent = pgTable(
     heatingGas: boolean("heating_gas"),
     heatingSolidFuel: boolean("heating_solid_fuel"),
     heatingOther: boolean("heating_other"),
-    elevator: boolean("elevator"),
-    terrace: boolean("terrace"),
-    parking: boolean("parking"),
-    garage: boolean("garage"),
   },
   (housesForRent) => {
     return {
