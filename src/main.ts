@@ -4,35 +4,32 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { migrationClient } from "./db/drizzle.ts";
 
-//TODO nije provereno radi li prelazak na novu stranu
 const startUrls = [
-  // {
-  //   url: "https://www.nekretnine.rs/stambeni-objekti/stanovi/izdavanje-prodaja/prodaja/cena/1_100000/lista/po-stranici/20/",
-  //   label: "propertiesList",
-  // },
-
-  //NE ZABORAVI: PO STRANICI 50!!!!!!
-  //NE ZABORAVI FILTER SRBIJA!!!!!
+  //todo NE ZABORAVI: PO STRANICI 50!!!!!!
+  //todo NE ZABORAVI FILTER SRBIJA!!!!!
   // na kucama za prodaju ima ih i sa cenom undefined
   // na svim kucama je sa zemljama van srbije
   // todo izbaci duplikate
-
   ////
-
   // todo posle
   // await crawler.run(startUrls); dodaj ciscenje podataka
-
   /////
+  // {
+  //   // houses for rent - done
+  //   url: "https://www.nekretnine.rs/stambeni-objekti/kuce/izdavanje-prodaja/izdavanje/lista/po-stranici/20/",
+  //   label: "propertiesList",
+  // },
+  // {
+  //   // houses for sale - done
+  //   url: "https://www.nekretnine.rs/stambeni-objekti/kuce/izdavanje-prodaja/prodaja/lista/po-stranici/20/",
+  //   label: "propertiesList",
+  // },
   {
-    // houses for rent - done
-    url: "https://www.nekretnine.rs/stambeni-objekti/kuce/izdavanje-prodaja/izdavanje/lista/po-stranici/20/",
+    // apartments for sale - curr
+    url: "https://www.nekretnine.rs/stambeni-objekti/stanovi/izdavanje-prodaja/izdavanje/lista/po-stranici/20/",
     label: "propertiesList",
   },
-  {
-    // houses for sale
-    url: "https://www.nekretnine.rs/stambeni-objekti/kuce/izdavanje-prodaja/prodaja/lista/po-stranici/20/",
-    label: "propertiesList",
-  },
+
   // {
   //   // https://www.nekretnine.rs/stambeni-objekti/stanovi/undefined/Nk_49ImEdhu/
   //   url: "https://www.nekretnine.rs/stambeni-objekti/kuce/vozdovac-vozdovacka-crkva-kostolacka-207m2-kostolacka/Nk-DfUfFK6M/",

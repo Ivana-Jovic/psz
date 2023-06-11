@@ -15,6 +15,13 @@
       "when": 1686512172313,
       "tag": "0001_yellow_midnight",
       "breakpoints": false
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1686520232467,
+      "tag": "0002_serious_sabra",
+      "breakpoints": false
     }
   ]
 }

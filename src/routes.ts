@@ -2,13 +2,13 @@ import { Dataset, createCheerioRouter } from "crawlee";
 import { Cheerio, AnyNode, CheerioAPI } from "cheerio";
 import { db } from "./db/drizzle.ts";
 import {
-  aparmentsForRent,
-  NewAparmentsForRent,
-} from "./db/schema/aparmentsForRent.ts";
+  apartmentsForRent,
+  NewApartmentsForRent,
+} from "./db/schema/apartmentsForRent.ts";
 import {
-  aparmentsForSale,
-  NewAparmentsForSale,
-} from "./db/schema/aparmentsForSale.ts";
+  apartmentsForSale,
+  NewApartmentsForSale,
+} from "./db/schema/apartmentsForSale.ts";
 import { housesForRent, NewHousesForRent } from "./db/schema/housesForRent.ts";
 import { housesForSale, NewHousesForSale } from "./db/schema/housesForSale.ts";
 
@@ -204,7 +204,7 @@ router.addHandler("property", async ({ request, $, log }) => {
   }
 
   if (isApartment) {
-    const propertyObjApartment: NewAparmentsForSale | NewAparmentsForRent = {
+    const propertyObjApartment: NewApartmentsForSale | NewApartmentsForRent = {
       url: request.url, //request.loadedUrl,
       title,
       price: price?.toString(),
@@ -237,10 +237,10 @@ router.addHandler("property", async ({ request, $, log }) => {
 
     log.info(`Currently on apartment - "${title}"`, propertyObjApartment);
     await db
-      .insert(isForRent ? aparmentsForRent : aparmentsForSale)
+      .insert(isForRent ? apartmentsForRent : apartmentsForSale)
       .values(propertyObjApartment)
       .onConflictDoUpdate({
-        target: [(isForRent ? aparmentsForRent : aparmentsForSale).url],
+        target: [(isForRent ? apartmentsForRent : apartmentsForSale).url],
         set: { ...propertyObjApartment },
       });
   } else {

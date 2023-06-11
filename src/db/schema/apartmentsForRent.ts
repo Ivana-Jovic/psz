@@ -6,11 +6,12 @@ import {
   varchar,
   integer,
   uniqueIndex,
+  PgTableWithColumns, // ovo treba
 } from "drizzle-orm/pg-core";
 import { InferModel } from "drizzle-orm";
 
-export const aparmentsForSale = pgTable(
-  "aparments_for_sale",
+export const apartmentsForRent = pgTable(
+  "apartments_for_rent",
   {
     id: serial("id").primaryKey(),
     url: varchar("url", { length: 255 }),
@@ -40,14 +41,17 @@ export const aparmentsForSale = pgTable(
     heatingOther: boolean("heating_other"),
     validOffer: boolean("valid_offer").notNull().default(true),
   },
-  (aparmentsForSale) => {
+  (apartmentsForRent) => {
     return {
-      urlIndex: uniqueIndex("idx_aparments_for_sale_url").on(
-        aparmentsForSale.url
+      urlIndex: uniqueIndex("idx_apartments_for_rent_url").on(
+        apartmentsForRent.url
       ),
     };
   }
 );
 
-export type AparmentsForSale = InferModel<typeof aparmentsForSale>; // return type when queried
-export type NewAparmentsForSale = InferModel<typeof aparmentsForSale, "insert">; // insert type
+export type ApartmentsForRent = InferModel<typeof apartmentsForRent>; // return type when queried
+export type NewApartmentsForRent = InferModel<
+  typeof apartmentsForRent,
+  "insert"
+>; // insert type
