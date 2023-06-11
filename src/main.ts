@@ -6,21 +6,43 @@ import { migrationClient } from "./db/drizzle.ts";
 
 //TODO nije provereno radi li prelazak na novu stranu
 const startUrls = [
-  //   {
-  //     url: "https://www.nekretnine.rs/stambeni-objekti/stanovi/izdavanje-prodaja/prodaja/cena/1_100000/lista/po-stranici/20/",
-  //     label: "propertiesList",
-  //   },
+  // {
+  //   url: "https://www.nekretnine.rs/stambeni-objekti/stanovi/izdavanje-prodaja/prodaja/cena/1_100000/lista/po-stranici/20/",
+  //   label: "propertiesList",
+  // },
 
+  //NE ZABORAVI: PO STRANICI 50!!!!!!
+  //NE ZABORAVI FILTER SRBIJA!!!!!
+  // na kucama za prodaju ima ih i sa cenom undefined
+  // na svim kucama je sa zemljama van srbije
+  // todo izbaci duplikate
+
+  ////
+
+  // todo posle
+  // await crawler.run(startUrls); dodaj ciscenje podataka
+
+  /////
   {
-    // https://www.nekretnine.rs/stambeni-objekti/stanovi/undefined/Nk_49ImEdhu/
-    url: "https://www.nekretnine.rs/stambeni-objekti/stanovi/petosoban-stan-sa-garaznim-mestom-vracarski-plato/NkpyXfjXRJ_/",
-    label: "property",
+    // houses for rent - done
+    url: "https://www.nekretnine.rs/stambeni-objekti/kuce/izdavanje-prodaja/izdavanje/lista/po-stranici/20/",
+    label: "propertiesList",
   },
+  {
+    // houses for sale
+    url: "https://www.nekretnine.rs/stambeni-objekti/kuce/izdavanje-prodaja/prodaja/lista/po-stranici/20/",
+    label: "propertiesList",
+  },
+  // {
+  //   // https://www.nekretnine.rs/stambeni-objekti/stanovi/undefined/Nk_49ImEdhu/
+  //   url: "https://www.nekretnine.rs/stambeni-objekti/kuce/vozdovac-vozdovacka-crkva-kostolacka-207m2-kostolacka/Nk-DfUfFK6M/",
+  //   label: "property",
+  // },
 ];
 
 const crawler = new CheerioCrawler({
   requestHandler: router,
-  maxRequestsPerCrawl: 10,
+  // maxRequestsPerCrawl: 50,
   maxRequestsPerMinute: 20,
 });
 

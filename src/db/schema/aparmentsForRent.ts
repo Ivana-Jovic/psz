@@ -3,7 +3,6 @@ import {
   decimal,
   pgTable,
   serial,
-  text,
   varchar,
   integer,
   uniqueIndex,
@@ -40,6 +39,7 @@ export const aparmentsForRent = pgTable(
     heatingGas: boolean("heating_gas"),
     heatingSolidFuel: boolean("heating_solid_fuel"),
     heatingOther: boolean("heating_other"),
+    validOffer: boolean("valid_offer").notNull().default(true),
   },
   (aparmentsForRent) => {
     return {

@@ -29,7 +29,7 @@ router.addHandler(
     await enqueueLinks({
       label: "property",
       forefront: true,
-      selector: ".offer-title",
+      selector: ".offer-title > a",
     });
 
     await enqueueLinks({
@@ -138,6 +138,7 @@ router.addHandler("property", async ({ request, $, log }) => {
 
   const numOfBathrooms = getDetailNumber("broj kupatila", detailsMainList);
   const numOfRooms = getDetailNumber("ukupan broj soba", detailsMainList);
+
   const registered =
     getDetail("uknjiženo", detailsMainList) === "da"
       ? true
@@ -156,7 +157,6 @@ router.addHandler("property", async ({ request, $, log }) => {
     "etažno grejanje na čvrsto gorivo"
   );
   const heatingOther =
-    // heating &&
     (heating?.length ?? 0) > 0 &&
     !heatingCentral &&
     !heatingCentral &&
@@ -185,77 +185,57 @@ router.addHandler("property", async ({ request, $, log }) => {
   const garage = !!detailsAdditionallist?.find(
     (elem) => elem.includes("garaža") || elem.includes("garažno mesto")
   );
-  //TODO check if ok zato sto se koristi i for sale tip
-  const propertyObjApartment: NewAparmentsForRent = {
-    url: request.url, //request.loadedUrl,
-    title,
-    price: price?.toString(),
-    size: size?.toString(),
-    // isForRent,
-    // isApartment,
-    location,
-    city,
-    yearOfConstruction,
-    // landSurface,
-    floor,
-    totalFloors,
-    numOfBathrooms: numOfBathrooms?.toString(),
-    numOfRooms: numOfRooms?.toString(),
-    registered,
-    elevator,
-    terrace,
-    parking,
-    garage,
-    // heating,
-    heatingCentral,
-    heatingTA,
-    heatingAirConditioning,
-    heatingFloor,
-    heatingElectricity,
-    heatingGas,
-    heatingSolidFuel,
-    heatingOther,
-  };
-  //TODO izmeni redosled kolona u bazi
-  //TODO check if ok zato sto se koristi i for sale tip
-  const propertyObjHouse: NewHousesForRent = {
-    url: request.url, //request.loadedUrl,
-    title,
-    price: price?.toString(),
-    size: size?.toString(),
-    // isForRent,
-    // isApartment,
-    location,
-    city,
-    yearOfConstruction,
-    landSurface: landSurface?.toString(),
-    // floor,
-    totalFloors,
-    numOfBathrooms: numOfBathrooms?.toString(),
-    numOfRooms: numOfRooms?.toString(),
-    registered,
-    elevator,
-    terrace,
-    parking,
-    garage,
-    // heating,
-    heatingCentral,
-    heatingTA,
-    heatingAirConditioning,
-    heatingFloor,
-    heatingElectricity,
-    heatingGas,
-    heatingSolidFuel,
-    heatingOther,
-  };
-  log.info(`Currently on "${title}"`, propertyObjApartment);
-  // log.info(`Currently on "${title}"`, aparmentsForRent.);
+
+  //TODO izbaci iz baze kuce bez cene
   if (isForRent === undefined || isApartment === undefined) {
-    //todo log
+    log.warning(
+      `Can't insert "${title}" - there is not a defined type`
+      // isApartment ? propertyObjApartment : propertyObjHouse
+    );
+    return;
+  }
+
+  if (price === undefined) {
+    log.warning(
+      `Can't insert "${title}" - price is undefined`
+      // isApartment ? propertyObjApartment : propertyObjHouse
+    );
     return;
   }
 
   if (isApartment) {
+    const propertyObjApartment: NewAparmentsForSale | NewAparmentsForRent = {
+      url: request.url, //request.loadedUrl,
+      title,
+      price: price?.toString(),
+      size: size?.toString(),
+      // isForRent,
+      // isApartment,
+      location,
+      city,
+      yearOfConstruction,
+      // landSurface,
+      floor,
+      totalFloors,
+      numOfBathrooms: numOfBathrooms?.toString(),
+      numOfRooms: numOfRooms?.toString(),
+      registered,
+      elevator,
+      terrace,
+      parking,
+      garage,
+      // heating,
+      heatingCentral,
+      heatingTA,
+      heatingAirConditioning,
+      heatingFloor,
+      heatingElectricity,
+      heatingGas,
+      heatingSolidFuel,
+      heatingOther,
+    };
+
+    log.info(`Currently on apartment - "${title}"`, propertyObjApartment);
     await db
       .insert(isForRent ? aparmentsForRent : aparmentsForSale)
       .values(propertyObjApartment)
@@ -265,6 +245,38 @@ router.addHandler("property", async ({ request, $, log }) => {
       });
   } else {
     // house
+    const propertyObjHouse: NewHousesForSale | NewHousesForRent = {
+      url: request.url, //request.loadedUrl,
+      title,
+      price: price?.toString(),
+      size: size?.toString(),
+      // isForRent,
+      // isApartment,
+      location,
+      city,
+      yearOfConstruction,
+      landSurface: landSurface?.toString(),
+      // floor,
+      totalFloors,
+      numOfBathrooms: numOfBathrooms?.toString(),
+      numOfRooms: numOfRooms?.toString(),
+      registered,
+      elevator,
+      terrace,
+      parking,
+      garage,
+      // heating,
+      heatingCentral,
+      heatingTA,
+      heatingAirConditioning,
+      heatingFloor,
+      heatingElectricity,
+      heatingGas,
+      heatingSolidFuel,
+      heatingOther,
+    };
+
+    log.info(`Currently on house - "${title}"`, propertyObjHouse);
     await db
       .insert(isForRent ? housesForRent : housesForSale)
       .values(propertyObjHouse)
