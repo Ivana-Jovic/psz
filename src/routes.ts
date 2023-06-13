@@ -69,6 +69,7 @@ const getDetailNumber = (detail: string, detailsList: string[]) => {
 };
 
 const stringToNumber = (str: string) => {
+  if (str.length === 0) return undefined;
   return isNaN(+str) ? undefined : +str;
 };
 
@@ -114,7 +115,9 @@ router.addHandler("property", async ({ request, $, log }) => {
     detailsMainList
   );
 
-  const landSurface = getDetailNumber("površina zemljišta", detailsMainList);
+  const landSurface = stringToNumber(
+    getDetail("površina zemljišta", detailsMainList)?.split(" ar")[0] ?? ""
+  );
 
   const totalFloors = getDetailNumber("ukupan brој spratova", detailsMainList);
   let floor: number | undefined = undefined;

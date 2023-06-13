@@ -14,25 +14,38 @@ const startUrls = [
   // todo posle
   // await crawler.run(startUrls); dodaj ciscenje podataka
   /////
-  // {
-  //   // houses for rent - done
-  //   url: "https://www.nekretnine.rs/stambeni-objekti/kuce/izdavanje-prodaja/izdavanje/lista/po-stranici/20/",
-  //   label: "propertiesList",
-  // },
-  // {
-  //   // houses for sale - done
-  //   url: "https://www.nekretnine.rs/stambeni-objekti/kuce/izdavanje-prodaja/prodaja/lista/po-stranici/20/",
-  //   label: "propertiesList",
-  // },
   {
-    // apartments for sale - curr
-    url: "https://www.nekretnine.rs/stambeni-objekti/stanovi/izdavanje-prodaja/izdavanje/lista/po-stranici/20/",
+    // houses for rent - done
+    url: "https://www.nekretnine.rs/stambeni-objekti/kuce/izdavanje-prodaja/izdavanje/lista/po-stranici/20/",
     label: "propertiesList",
   },
-
+  {
+    // houses for sale - done
+    url: "https://www.nekretnine.rs/stambeni-objekti/kuce/izdavanje-prodaja/prodaja/lista/po-stranici/20/",
+    label: "propertiesList",
+  },
   // {
-  //   // https://www.nekretnine.rs/stambeni-objekti/stanovi/undefined/Nk_49ImEdhu/
-  //   url: "https://www.nekretnine.rs/stambeni-objekti/kuce/vozdovac-vozdovacka-crkva-kostolacka-207m2-kostolacka/Nk-DfUfFK6M/",
+  //   // apartments for rent - done
+  //   url: "https://www.nekretnine.rs/stambeni-objekti/stanovi/izdavanje-prodaja/izdavanje/lista/po-stranici/20/",
+  //   label: "propertiesList",
+  // },
+  // {
+  //   // apartments for sale do 100 000 - done
+  //   url: "https://www.nekretnine.rs/stambeni-objekti/stanovi/izdavanje-prodaja/prodaja/cena/_100000/lista/po-stranici/20/",
+  //   label: "propertiesList",
+  // },
+  // {
+  //   // apartments for sale od 100k do 160k - dpne
+  //   url: "https://www.nekretnine.rs/stambeni-objekti/stanovi/izdavanje-prodaja/prodaja/cena/100000_160000/lista/po-stranici/20/",
+  //   label: "propertiesList",
+  // },
+  // {
+  //   // apartments for sale od 160k - done
+  //   url: "https://www.nekretnine.rs/stambeni-objekti/stanovi/izdavanje-prodaja/prodaja/cena/160000_/lista/po-stranici/20/",
+  //   label: "propertiesList",
+  // },
+  // {
+  //   url: "https://www.nekretnine.rs/stambeni-objekti/kuce/adamovicevo-naselje-useljiva-kuca/NkR5eYXTatH/",
   //   label: "property",
   // },
 ];
