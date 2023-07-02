@@ -3,7 +3,7 @@ import { router } from "./routes.ts";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { migrationClient } from "./db/drizzle.ts";
-import { and, eq, isNull, or } from "drizzle-orm";
+import { and, eq, isNull, like, or } from "drizzle-orm";
 import { db } from "./db/drizzle.ts";
 import { housesForRent, HousesForRent } from "./db/schema/housesForRent.ts";
 import { housesForSale, HousesForSale } from "./db/schema/housesForSale.ts";
@@ -114,7 +114,8 @@ const arQuery = db
       isNull(apartmentsForRent.size),
       isNull(apartmentsForRent.location),
       isNull(apartmentsForRent.numOfRooms),
-      isNull(apartmentsForRent.city)
+      isNull(apartmentsForRent.city),
+      like(apartmentsForRent.url, "%/stambeni-objekti/kuce%")
     )
   );
 const asQuery = db
@@ -128,7 +129,8 @@ const asQuery = db
       isNull(apartmentsForSale.size),
       isNull(apartmentsForSale.location),
       isNull(apartmentsForSale.numOfRooms),
-      isNull(apartmentsForSale.city)
+      isNull(apartmentsForSale.city),
+      like(apartmentsForSale.url, "%/stambeni-objekti/kuce%")
     )
   );
 
