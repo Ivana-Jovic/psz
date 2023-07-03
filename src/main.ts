@@ -3,7 +3,7 @@ import { router } from "./routes.ts";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { migrationClient } from "./db/drizzle.ts";
-import { and, eq, isNull, like, or } from "drizzle-orm";
+import { and, eq, isNull, like, or, lt, gt } from "drizzle-orm";
 import { db } from "./db/drizzle.ts";
 import { housesForRent, HousesForRent } from "./db/schema/housesForRent.ts";
 import { housesForSale, HousesForSale } from "./db/schema/housesForSale.ts";
@@ -17,6 +17,9 @@ import {
 } from "./db/schema/apartmentsForRent.ts";
 import { PgDialect } from "drizzle-orm/pg-core";
 import { exit } from "process";
+import { cleanUpData } from "./cleanUpData.ts";
+import { getAndArrangeData } from "./arrangeData.ts";
+import { LinearRegression } from "./linearRegression.ts";
 
 const pgDialect = new PgDialect();
 
@@ -25,7 +28,6 @@ const startUrls = [
   // NE ZABORAVI FILTER SRBIJA!!!!!
   // na kucama za prodaju ima ih i sa cenom undefined
   // na svim kucama je sa zemljama van srbije
-  // todo izbaci duplikate
   ////
   /////
   // {
@@ -72,68 +74,23 @@ const crawler = new CheerioCrawler({
 // this will automatically run needed migrations on the database
 await migrate(drizzle(migrationClient), { migrationsFolder: "./drizzle" }); //razl
 
-await crawler.run(startUrls);
+// await crawler.run(startUrls);//Done
 
-// clean up the data
-const hrQuery = db
-  .update(housesForRent)
-  .set({ validOffer: false })
-  .where(
-    or(
-      isNull(housesForRent.url),
-      isNull(housesForRent.title),
-      isNull(housesForRent.price),
-      isNull(housesForRent.size),
-      isNull(housesForRent.location),
-      isNull(housesForRent.numOfRooms),
-      isNull(housesForRent.city)
-    )
-  );
-const hsQuery = db
-  .update(housesForSale)
-  .set({ validOffer: false })
-  .where(
-    or(
-      isNull(housesForSale.url),
-      isNull(housesForSale.title),
-      isNull(housesForSale.price),
-      isNull(housesForSale.size),
-      isNull(housesForSale.location),
-      isNull(housesForSale.numOfRooms),
-      isNull(housesForSale.city)
-    )
-  );
-const arQuery = db
-  .update(apartmentsForRent)
-  .set({ validOffer: false })
-  .where(
-    or(
-      isNull(apartmentsForRent.url),
-      isNull(apartmentsForRent.title),
-      isNull(apartmentsForRent.price),
-      isNull(apartmentsForRent.size),
-      isNull(apartmentsForRent.location),
-      isNull(apartmentsForRent.numOfRooms),
-      isNull(apartmentsForRent.city),
-      like(apartmentsForRent.url, "%/stambeni-objekti/kuce%")
-    )
-  );
-const asQuery = db
-  .update(apartmentsForSale)
-  .set({ validOffer: false })
-  .where(
-    or(
-      isNull(apartmentsForSale.url),
-      isNull(apartmentsForSale.title),
-      isNull(apartmentsForSale.price),
-      isNull(apartmentsForSale.size),
-      isNull(apartmentsForSale.location),
-      isNull(apartmentsForSale.numOfRooms),
-      isNull(apartmentsForSale.city),
-      like(apartmentsForSale.url, "%/stambeni-objekti/kuce%")
-    )
-  );
-
-await Promise.all([hrQuery, hsQuery, arQuery, asQuery]);
-
+// await cleanUpData(); //Done
+// const regression = new LinearRegression(0.01, 2);
+// const X = [
+//   [1, 2],
+//   [2, 3],
+//   [3, 4],
+//   [4, 5],
+//   [5, 6],
+// ];
+// const y = [3, 5, 7, 9, 11];
+// regression.train(X, y, 2000);
+// console.log(regression.predict([6, 7]));
+const regression = new LinearRegression(0.01, 1);
+const X = [[1], [2], [3], [4], [5]];
+const y = [3, 5, 7, 9, 11];
+regression.train(X, y, 1000);
+console.log(regression.predict([5]));
 exit();
