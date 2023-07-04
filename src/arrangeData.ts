@@ -98,13 +98,13 @@ const floorTmp = (floor: number | null, totalFloors: number | null) => {
 // boolean pretvoriti u 0,1: registered, elevator, terrace, parking, garage, heating
 
 export const getAndArrangeData = async () => {
-  const data = await getData();
+  const data: ApartmentsForSale[] = await getData();
   const avg = await getAvg();
   const newData: Row[] = [];
 
   data.map((row) => {
     const size = row.size ? +row.size : 1;
-    const locationWithoutCity = data[0].location?.split(", ")[1];
+    const locationWithoutCity = row.location?.split(", ")[1];
     const location = locationWithoutCity
       ? distances[locationWithoutCity] ?? 0
       : 0;

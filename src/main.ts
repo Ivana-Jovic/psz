@@ -21,13 +21,11 @@ import { cleanUpData } from "./cleanUpData.ts";
 import { deNormalize, getAndArrangeData, getAvg } from "./arrangeData.ts";
 import {
   LinearRegression,
-  calculateMAE,
-  calculateR2,
-  calculateRMSE,
   helperObj,
   trainTestSplit,
 } from "./linearRegression.ts";
 import { NewTheta, theta } from "./db/schema/theta.ts";
+import { calculateMAE, calculateR2, calculateRMSE } from "./errors.ts";
 
 const pgDialect = new PgDialect();
 
@@ -85,8 +83,6 @@ await migrate(drizzle(migrationClient), { migrationsFolder: "./drizzle" }); //ra
 // await crawler.run(startUrls);//Done
 
 // await cleanUpData(); //Done
-
-// const [train, test] = await trainTestSplit();
 
 const regression = new LinearRegression(0.01);
 const [trainX, trainY, testX, testY] = await trainTestSplit();

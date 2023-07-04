@@ -89,13 +89,16 @@ export const cleanUpData = async () => {
     .where(
       or(
         eq(apartmentsForSale.validOffer, false),
-        gt(apartmentsForSale.size, "1000"),
+        gt(apartmentsForSale.size, "600"),
         lt(apartmentsForSale.size, "15"),
         gt(apartmentsForSale.numOfRooms, "8"),
         lt(apartmentsForSale.numOfRooms, "1"),
         gt(apartmentsForSale.numOfBathrooms, "6"),
         lt(apartmentsForSale.numOfBathrooms, "1"),
         lt(apartmentsForSale.price, "15000"),
+        lt(apartmentsForSale.floor, -1),
+        lt(apartmentsForSale.totalFloors, 0),
+        gt(apartmentsForSale.totalFloors, 40),
         and(gt(apartmentsForSale.size, "0"), sql`price / size < 500`)
       )
     );
