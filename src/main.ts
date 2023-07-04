@@ -18,8 +18,13 @@ import {
 import { PgDialect } from "drizzle-orm/pg-core";
 import { exit } from "process";
 import { cleanUpData } from "./cleanUpData.ts";
-import { getAndArrangeData } from "./arrangeData.ts";
-import { LinearRegression } from "./linearRegression.ts";
+import { deNormalize, getAndArrangeData, getAvg } from "./arrangeData.ts";
+import {
+  LinearRegression,
+  calculateR2,
+  calculateRMSE,
+  trainTestSplit,
+} from "./linearRegression.ts";
 
 const pgDialect = new PgDialect();
 
@@ -77,20 +82,36 @@ await migrate(drizzle(migrationClient), { migrationsFolder: "./drizzle" }); //ra
 // await crawler.run(startUrls);//Done
 
 // await cleanUpData(); //Done
-// const regression = new LinearRegression(0.01, 2);
-// const X = [
-//   [1, 2],
-//   [2, 3],
-//   [3, 4],
-//   [4, 5],
-//   [5, 6],
-// ];
-// const y = [3, 5, 7, 9, 11];
-// regression.train(X, y, 2000);
-// console.log(regression.predict([6, 7]));
-const regression = new LinearRegression(0.01, 1);
-const X = [[1], [2], [3], [4], [5]];
-const y = [3, 5, 7, 9, 11];
-regression.train(X, y, 1000);
-console.log(regression.predict([5]));
+
+const [train, test] = await trainTestSplit();
+
+const regression = new LinearRegression(0.01);
+const [trainX, trainY, testX, testY] = await trainTestSplit();
+regression.train(trainX, trainY, 2000);
+
+const predicted: number[] = [];
+
+testX.map((elem, index) => {
+  predicted.push(regression.predict(elem));
+});
+
+const d = await getAvg();
+const minPr = +d[0].minPrice;
+const maxPr = +d[0].maxPrice;
+
+const testYNotNormalized = testY.map((elem, i) => {
+  return deNormalize(elem, minPr, d[0].maxPrice);
+});
+
+const predictedNotNormalized = predicted.map((elem, i) => {
+  return deNormalize(elem, minPr, maxPr);
+});
+
+console.log(testYNotNormalized[0], predictedNotNormalized[0], minPr, maxPr);
+
+const rmse = calculateRMSE(testYNotNormalized, predictedNotNormalized);
+console.log("rmse", rmse);
+const r2 = calculateR2(testYNotNormalized, predictedNotNormalized);
+console.log("r2", r2);
+
 exit();

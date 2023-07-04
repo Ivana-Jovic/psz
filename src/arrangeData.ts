@@ -8,18 +8,17 @@ import { top5locations } from "./top5Locations.ts";
 import { distances } from "./distances.ts";
 // import distances from "distances.json";
 
-type Row = {
-  id: number;
-  url: string;
-  title: string;
+export type Row = {
+  [x: string]: number;
+  // | string;
+  // id: number;
+  // url: string;
+  // title: string;
   price: number;
   size: number;
   location: number;
-  // city: varchar("city", { length: 255 }),
   yearOfConstruction: number;
-  //   landSurface: decimal("land_surface"),
   floor: number;
-  // totalFloors: integer("total_floors"),
   numOfBathrooms: number;
   numOfRooms: number;
   registered: number;
@@ -27,16 +26,6 @@ type Row = {
   terrace: number;
   parking: number;
   garage: number;
-  // heatingCentral: boolean("heating_central"),
-  // heatingTA: boolean("heating_ta"),
-  // heatingAirConditioning: boolean("heating_air_conditioning"),
-  // heatingFloor: boolean("heating_floor"),
-  // heatingElectricity: boolean("heating_electricity"),
-  // heatingGas: boolean("heating_gas"),
-  // heatingSolidFuel: boolean("heating_solid_fuel"),
-  // heatingOther: boolean("heating_other"),
-  // validOffer: boolean("valid_offer").notNull().default(true),
-  // isOutlier: boolean("is_outlier").notNull().default(false),
 };
 const boolToNumber = (bool: boolean | null) => {
   return bool ? +bool : 0;
@@ -60,11 +49,11 @@ const getData = async () => {
 
   return data;
 };
-const getAvg = async () => {
+export const getAvg = async () => {
   const locNew = top5locations.map(
     (location: string) => "beograd, " + location.toLowerCase()
   );
-  const data = await db
+  const data: any[] = await db
     .select({
       avgBath: sql<number>`avg(num_of_bathrooms)`,
       avgYear: sql<number>`avg(year_of_construction)`,
@@ -90,8 +79,12 @@ const getAvg = async () => {
   return data;
 };
 const normalize = (val: number, min: number, max: number) => {
-  return (val - min) / (max - min);
+  return (val - +min) / (+max - +min);
 };
+export const deNormalize = (norm: number, min: number, max: number) => {
+  return norm * (+max - +min) + +min;
+};
+
 const normalizeLocation = (val: number) => {
   const values = Object.values(distances);
   const maxValue = Math.max(...values);
@@ -133,9 +126,9 @@ export const getAndArrangeData = async () => {
     const year = row.yearOfConstruction ?? avg[0].avgYear;
 
     const newRow: Row = {
-      id: row.id,
-      url: row.url ?? "",
-      title: row.title ?? "",
+      // id: row.id,
+      // url: row.url ?? "",
+      // title: row.title ?? "",
       price: normalize(price, avg[0].minPrice, avg[0].maxPrice),
       size: normalize(size, avg[0].minSize, avg[0].maxSize),
       location: normalizeLocation(location),
