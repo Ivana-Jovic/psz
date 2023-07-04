@@ -1,4 +1,14 @@
-import { and, eq, isNull, like, or, lt, gt, sql } from "drizzle-orm";
+import {
+  and,
+  eq,
+  isNull,
+  like,
+  or,
+  lt,
+  gt,
+  sql,
+  notInArray,
+} from "drizzle-orm";
 import { db } from "./db/drizzle.ts";
 import { housesForRent, HousesForRent } from "./db/schema/housesForRent.ts";
 import { housesForSale, HousesForSale } from "./db/schema/housesForSale.ts";
@@ -78,19 +88,33 @@ export const cleanUpData = async () => {
     .set({ isOutlier: true })
     .where(
       or(
-        // eq(apartmentsForSale.validOffer, false),
-        // gt(apartmentsForSale.size, "1000"),
-        // lt(apartmentsForSale.size, "15"),
-        // gt(apartmentsForSale.numOfRooms, "8"),
-        // lt(apartmentsForSale.numOfRooms, "1"),
-        // gt(apartmentsForSale.numOfBathrooms, "6"),
-        // lt(apartmentsForSale.numOfBathrooms, "1"),
-        // lt(apartmentsForSale.price, "15000"),
+        eq(apartmentsForSale.validOffer, false),
+        gt(apartmentsForSale.size, "1000"),
+        lt(apartmentsForSale.size, "15"),
+        gt(apartmentsForSale.numOfRooms, "8"),
+        lt(apartmentsForSale.numOfRooms, "1"),
+        gt(apartmentsForSale.numOfBathrooms, "6"),
+        lt(apartmentsForSale.numOfBathrooms, "1"),
+        lt(apartmentsForSale.price, "15000"),
         and(gt(apartmentsForSale.size, "0"), sql`price / size < 500`)
       )
     );
 
   await cleanup; //Done
+
+  // const sq = db
+  //   .select({ min: sql<number>`min(id)` })
+  //   .from(apartmentsForSale)
+  //   .groupBy(
+  //     sql`${apartmentsForSale.title}, ${apartmentsForSale.size},
+  //     ${apartmentsForSale.location}, ${apartmentsForSale.price}`
+  //   );
+  // const cleanup2 = db
+  //   .update(apartmentsForSale)
+  //   .set({ isOutlier: true })
+  //   .where(notInArray(apartmentsForSale.id, sq));
+
+  // await cleanup2;
 
   console.log("clean up done");
 };

@@ -13,8 +13,8 @@ export const top5locations = [
   //   'Dušanovac',
   //   'Farmaceutski fakultet',
   //   'Jajinci',
-  'Konjarnik', //ok
-  'Lekino brdo', //ok
+  'Konjarnik', //okk
+  'Lekino brdo', //okk
   //   'Marinkova bara',
   //   'Pašino brdo',
   //   'Stepa Stepanović',

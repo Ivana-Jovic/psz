@@ -6,14 +6,9 @@ import {
 } from "./db/schema/apartmentsForSale.ts";
 import { top5locations } from "./top5Locations.ts";
 import { distances } from "./distances.ts";
-// import distances from "distances.json";
 
 export type Row = {
   [x: string]: number;
-  // | string;
-  // id: number;
-  // url: string;
-  // title: string;
   price: number;
   size: number;
   location: number;
@@ -32,7 +27,6 @@ const boolToNumber = (bool: boolean | null) => {
 };
 
 const getData = async () => {
-  // const loc = ['konjarnik', 'novi beograd', 'mirijevo ii']; // prettier-ignore
   const locNew = top5locations.map(
     (location: string) => "beograd, " + location.toLowerCase()
   );
@@ -105,30 +99,21 @@ const floorTmp = (floor: number | null, totalFloors: number | null) => {
 
 export const getAndArrangeData = async () => {
   const data = await getData();
-  //   console.log(data.length);
-  //   console.log(data[0]);
   const avg = await getAvg();
   const newData: Row[] = [];
-  //   console.log(avg);
-  //   console.log(
-  //     "----",
-  //     data[0].location,
-  //     data[0].location?.split(", ")[1],
-  //     data[0].location ? distances[data[0].location.split(", ")[1]] : "]"
-  //   );
+
   data.map((row) => {
     const size = row.size ? +row.size : 1;
     const locationWithoutCity = data[0].location?.split(", ")[1];
-    const location = locationWithoutCity ? distances[locationWithoutCity] : 0;
+    const location = locationWithoutCity
+      ? distances[locationWithoutCity] ?? 0
+      : 0;
     const price = row.price ? +row.price : 1; //todo avg
     const bathrooms = row.numOfBathrooms ? +row.numOfBathrooms : avg[0].avgBath;
     const rooms = row.numOfRooms ? +row.numOfRooms : 1; //todo avg
     const year = row.yearOfConstruction ?? avg[0].avgYear;
 
     const newRow: Row = {
-      // id: row.id,
-      // url: row.url ?? "",
-      // title: row.title ?? "",
       price: normalize(price, avg[0].minPrice, avg[0].maxPrice),
       size: normalize(size, avg[0].minSize, avg[0].maxSize),
       location: normalizeLocation(location),

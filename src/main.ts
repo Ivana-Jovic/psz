@@ -21,10 +21,13 @@ import { cleanUpData } from "./cleanUpData.ts";
 import { deNormalize, getAndArrangeData, getAvg } from "./arrangeData.ts";
 import {
   LinearRegression,
+  calculateMAE,
   calculateR2,
   calculateRMSE,
+  helperObj,
   trainTestSplit,
 } from "./linearRegression.ts";
+import { NewTheta, theta } from "./db/schema/theta.ts";
 
 const pgDialect = new PgDialect();
 
@@ -83,11 +86,11 @@ await migrate(drizzle(migrationClient), { migrationsFolder: "./drizzle" }); //ra
 
 // await cleanUpData(); //Done
 
-const [train, test] = await trainTestSplit();
+// const [train, test] = await trainTestSplit();
 
 const regression = new LinearRegression(0.01);
 const [trainX, trainY, testX, testY] = await trainTestSplit();
-regression.train(trainX, trainY, 2000);
+const thetaLR: number[] = regression.train(trainX, trainY, 2000);
 
 const predicted: number[] = [];
 
@@ -111,7 +114,30 @@ console.log(testYNotNormalized[0], predictedNotNormalized[0], minPr, maxPr);
 
 const rmse = calculateRMSE(testYNotNormalized, predictedNotNormalized);
 console.log("rmse", rmse);
+const mae = calculateMAE(testYNotNormalized, predictedNotNormalized);
+console.log("mae", mae);
 const r2 = calculateR2(testYNotNormalized, predictedNotNormalized);
 console.log("r2", r2);
+
+//  ------
+const thetaNew: NewTheta = {
+  thetaZero: thetaLR[0]?.toString(),
+  size: thetaLR[helperObj["size"]]?.toString(),
+  location: thetaLR[helperObj["location"]]?.toString(),
+  yearOfConstruction: thetaLR[helperObj["yearOfConstruction"]]?.toString(),
+  floor: thetaLR[helperObj["floor"]]?.toString(),
+  numOfBathrooms: thetaLR[helperObj["numOfBathrooms"]]?.toString(),
+  numOfRooms: thetaLR[helperObj["numOfRooms"]]?.toString(),
+  registered: thetaLR[helperObj["registered"]]?.toString(),
+  elevator: thetaLR[helperObj["elevator"]]?.toString(),
+  terrace: thetaLR[helperObj["terrace"]]?.toString(),
+  parking: thetaLR[helperObj["parking"]]?.toString(),
+  garage: thetaLR[helperObj["garage"]]?.toString(),
+};
+await db.insert(theta).values(thetaNew);
+// .onConflictDoUpdate({
+//   target: [thetaLR.id],
+//   set: { ...thetaLR },
+// });
 
 exit();
