@@ -75,7 +75,7 @@ export const top5locations = [
   //   'Borča III',
   //   'Borča IV',
   //   'Borča V',
-  'Brodogradilište Beograd',
+  // 'Brodogradilište Beograd',
   //   'Brzi Brod',
   //   'Zvezdara (sve podlokacije)', //ok
   'Zvezdara', //ok
@@ -118,8 +118,8 @@ export const top5locations = [
   'Slavija',//okk
   'Vračar (Centar)', //okk
   'Vračar (Hram)', //okk
-  'Čukarica',
-  'Čukarička padina',
+  // 'Čukarica',
+  // 'Čukarička padina',
   //   'Dedinje (sve podlokacije)', //ok'
   'Dedinje', //ok
   'Dedinje (25. maj)', //okk
